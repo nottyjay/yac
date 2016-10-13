@@ -833,6 +833,28 @@ PHP_METHOD(yac, dump) {
 	yac_storage_free_list(list);
 	return;
 }
+
+/** {{{ proto public Yac::keys(void)
+*/
+PHP_METHOD(yac, keys) {
+	yac_item_list *list, *l;
+
+	if (!YAC_G(enable)) {
+		RETURN_FALSE;
+	}
+
+	list = l = yac_storage_keys();
+
+	array_init(return_value);
+	for(; l; l = l->next){
+		add_next_index_string(return_value, (char*)l->key);
+	}
+
+	yac_storage_free_list(list);
+	return;
+}
+
+
 /* }}} */
 
 #if 0
@@ -911,6 +933,7 @@ zend_function_entry yac_methods[] = {
 	PHP_ME(yac, flush, arginfo_yac_void, ZEND_ACC_PUBLIC)
 	PHP_ME(yac, info, arginfo_yac_void, ZEND_ACC_PUBLIC)
 	PHP_ME(yac, dump, arginfo_yac_void, ZEND_ACC_PUBLIC)
+	PHP_ME(yac, keys, arginfo_yac_void, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 /* }}} */

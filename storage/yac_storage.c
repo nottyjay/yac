@@ -604,6 +604,36 @@ yac_item_list * yac_storage_dump(unsigned int limit) /* {{{ */ {
 }
 /* }}} */
 
+yac_item_list * yac_storage_keys(void) /* {{{ */ {
+	yac_kv_key k;
+	yac_item_list *item, *list = NULL;
+
+	if (YAC_SG(slots_num)) {
+		unsigned int i = 0, n = 0;
+		for (; i<YAC_SG(slots_size) && n < YAC_SG(slots_num); i++) {
+			k = YAC_SG(slots)[i];
+			if (k.val) {
+				item = USER_ALLOC(sizeof(yac_item_list));
+				item->index = i;
+				item->h = k.h;
+				item->crc = k.crc;
+				item->ttl = k.ttl;
+				item->k_len = YAC_KEY_KLEN(k);
+				item->v_len = YAC_KEY_VLEN(k);
+				item->flag = k.flag;
+				item->size = k.size;
+				memcpy(item->key, k.key, YAC_STORAGE_MAX_KEY_LEN);
+				item->next = list;
+				list = item;
+				++n;
+			}
+		}
+	}
+
+	return list;
+}
+/* }}} */
+
 void yac_storage_free_list(yac_item_list *list) /* {{{ */ {
 	yac_item_list *l;
 	while (list) {
